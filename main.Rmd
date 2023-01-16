@@ -1,0 +1,80 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+# Set paht
+```{r}
+path = file.choose()
+```
+
+# import xls data
+
+```{r}
+install.packages("readxl")
+library("readxl")
+data.24 <- read_excel(path)
+data.24
+```
+
+# set column, row name, delete unnessesary data
+
+```{r}
+colnames(data.24) <- c("row", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12")
+data.24 <- data.24[2:8, ]
+data.24$row <- factor(data.24$row)
+data.24
+```
+
+# convert wide to long
+
+```{r}
+install.packages("tidyverse")
+library("tidyverse")
+
+data_long <- gather(data.24, key="column", value="ODvalue", 2, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13)
+# data_long <- spread(data.24, key="column", value="ODvalue", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12)
+data_long
+```
+# reshape data (add hour/ cell coloumn)
+
+```{r}
+# set hour
+data_long["hour"] <- 24
+# set cell density
+data_long["cell density"] <- 0
+data_long[data_long["row"]=="A",5] = 1000
+data_long[data_long["row"]=="B",5] = 2000
+data_long[data_long["row"]=="C",5] = 3000
+data_long[data_long["row"]=="D",5] = 4000
+data_long[data_long["row"]=="E",5] = 5000
+data_long[data_long["row"]=="F",5] = 6000
+data_long[data_long["row"]=="G",5] = 7000
+data_long[data_long["row"]=="H",5] = 8000
+# set cell type
+data_long["cell"] <- "none"
+data_long[data_long["column"]==1,6] = "WT"
+data_long[data_long["column"]==2,6] = "WT"
+data_long[data_long["column"]==3,6] = "WT"
+data_long[data_long["column"]==4,6] = "WT"
+data_long[data_long["column"]==5,6] = "WT"
+data_long[data_long["column"]==6,6] = "blank"
+data_long[data_long["column"]==7,6] = "KO"
+data_long[data_long["column"]==8,6] = "KO"
+data_long[data_long["column"]==9,6] = "KO"
+data_long[data_long["column"]==10,6] = "KO"
+data_long[data_long["column"]==11,6] = "KO"
+
+# delete row
+data_long
+```
+
+
+# write to file 
+
+```{r}
+file.name <- "24.csv"
+write_csv(data_long, "~/Desktop/test.csv")
+```
+
+
